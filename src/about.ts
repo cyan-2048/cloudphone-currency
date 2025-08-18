@@ -16,13 +16,6 @@ function handleBackEvent(ev: Event) {
 export function showAbout() {
   dialog.open = true;
   dialog.scrollTop = 0;
-  // Cyan: remove this in the final version
-  dialog.onkeydown = (e) => {
-    if (e.key === "*") {
-      localStorage.clear();
-      location.reload();
-    }
-  };
   dialog.focus();
   setHeaderText("About");
   hideInfoButton();
