@@ -1,34 +1,32 @@
 import { populateList } from "./currencyList";
 import {
   fetchUSDExchangeRates,
+  formatDate,
   USDExchangeRateResponse,
-  exchangeFormatted,
 } from "./exchangeApi";
 import { setup } from "./input";
 import "./currencyInput";
-
-let exchangeRates: USDExchangeRateResponse | undefined = undefined;
-
-async function fetchLatestRates() {
-  if (exchangeRates !== undefined) return exchangeRates;
-
-  try {
-    exchangeRates = await fetchUSDExchangeRates();
-    return exchangeRates;
-  } catch (e) {
-    console.warn(e);
-    // TODO: display error
-  }
-}
+import "./index.css";
+import { _ } from "./utils";
 
 populateList();
+
+const splash = _("splash") as HTMLDivElement;
+const asOfDate = _("as-of-date") as HTMLElement;
 
 fetchUSDExchangeRates()
   .then((rates) => {
     console.log(rates);
     if (!rates) return;
 
+    // Update and format "as of" date
+    asOfDate.innerText = formatDate(rates.date);
+
+    // Clear splash screen and update UI
     setup(rates);
+    queueMicrotask(() => {
+      splash.remove();
+    });
   })
   .catch((e) => console.warn(e));
 

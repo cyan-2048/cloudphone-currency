@@ -1,0 +1,66 @@
+#about {
+  overflow: auto;
+  background-color: var(--bg-secondary);
+}
+
+#about:focus {
+  outline: none;
+}
+
+#about h2 {
+  font-weight: bold;
+  text-align: center;
+  white-space: nowrap;
+}
+
+#about > div {
+  padding: 0.5rem;
+  padding-top: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#about h2,
+#about p,
+#about img {
+  display: block;
+  color: white;
+}
+
+#about p {
+  margin: 0;
+}
+
+/* QVGA (or bigger) */
+@media only screen and (min-width: 129px) {
+  #about h2 {
+    font-size: 18pt;
+  }
+
+  #about img {
+    height: 5rem;
+    width: 5rem;
+  }
+
+  #about p {
+    font-size: 15pt;
+  }
+}
+
+/* QQVGA */
+@media only screen and (max-width: 128px) {
+  #about h2 {
+    font-size: 9pt;
+    margin: 1.25rem 0;
+  }
+
+  #about img {
+    height: 2.5rem;
+    width: 2.5rem;
+  }
+
+  #about p {
+    font-size: 8pt;
+  }
+}

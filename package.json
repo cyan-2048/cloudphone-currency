@@ -1,8 +1,8 @@
 {
   "devDependencies": {
-    "esbuild": "0.25.8",
+    "@rsbuild/core": "^1.4.15",
     "prettier": "3.6.2",
-    "tsx": "^4.20.3",
+    "rsbuild-plugin-html-minifier-terser": "^1.1.2",
     "typescript": "^5.9.2"
   },
   "name": "cloudphone-currency",
@@ -10,9 +10,9 @@
   "description": "Currency converter for Cloud Phone keypad phones",
   "main": "./dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "esbuild --bundle src/index.ts --minify --drop:console --analyze --target=chrome128 --outfile=public/js/index.min.js",
-    "dev": "esbuild --watch --bundle src/index.ts --sourcemap --target=chrome128 --serve --outfile=public/js/index.js --servedir=public"
+    "build": "rsbuild build",
+    "dev": "rsbuild dev --open",
+    "preview": "rsbuild preview"
   },
   "repository": {
     "type": "git",

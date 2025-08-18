@@ -1,5 +1,6 @@
 import { Currency, CurrencyCode } from "./currency";
 import currencies from "./currencies.json";
+import countries from "./countries.json";
 
 export const USD: Currency = {
   currencyCode: "usd",
@@ -34,6 +35,8 @@ const ROUNDING_INCREMENTS = new Set([
 export type FractionDigits = 0 | 1 | 2 | 3;
 
 export const CURRENCIES = currencies as Currency[];
+
+export const COUNTRIES = new Map(Object.entries(countries)) as Map<string, CurrencyCode>;
 
 export function findCurrency(
   currencyCode: string | CurrencyCode,
@@ -90,4 +93,12 @@ export function formatFromCode(
 
 export function getCountryCode(currency: Currency) {
   return currency.languageCode.split("-")[1];
+}
+
+export function guessCurrency(countryCode: string) {
+  const currencyCode = COUNTRIES.get(countryCode.toUpperCase());
+  console.log('guessCurrency', countryCode, currencyCode);
+  if (currencyCode) {
+    return findCurrency(currencyCode);
+  }
 }

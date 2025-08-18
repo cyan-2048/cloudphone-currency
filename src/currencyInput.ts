@@ -118,9 +118,21 @@ export class CurrencyInput extends HTMLDivElement {
   private _groupSeparator: string = ",";
   private _currencySymbol: string = "$";
 
+  focus(options?: FocusOptions): void {
+    this._input.focus(options);
+  }
+
   constructor() {
     super();
     this._shadow = this.attachShadow({ mode: "closed", clonable: true });
+
+    const styles = new CSSStyleSheet();
+
+    styles.replaceSync(
+      `:host{width:100%;height:100%;}input{all:unset;height:inherit;width:inherit;}input:focus{outline:none;}`,
+    );
+
+    this._shadow.adoptedStyleSheets = [styles];
 
     this._input = document.createElement("input");
     this._input.type = "text";
@@ -317,7 +329,7 @@ export class CurrencyInput extends HTMLDivElement {
     const allowedMeta = e.ctrlKey || e.metaKey || e.altKey;
     if (allowedMeta) return;
 
-    const isRTL = (this.getAttribute('dir') || '').toLowerCase() === 'rtl';
+    const isRTL = (this.getAttribute("dir") || "").toLowerCase() === "rtl";
 
     // Handle arrow navigation across only numeric/decimal characters
     if (e.key === "ArrowLeft" || e.key === "ArrowRight") {

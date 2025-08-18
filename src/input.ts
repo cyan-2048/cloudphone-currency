@@ -1,4 +1,4 @@
-import { findCurrency, getCountryCode } from "./data/currencies";
+import { CURRENCIES, findCurrency, getCountryCode, guessCurrency } from "./data/currencies";
 import { exchange, USDExchangeRateResponse } from "./exchangeApi";
 import { CurrencyCode } from "./data/currency";
 import { _ } from "./utils";
@@ -12,13 +12,18 @@ import {
 } from "./events";
 import { selectCurrency, showCurrencyList } from "./currencyList";
 import { CurrencyInput } from "./currencyInput";
+import { setHeaderText } from "./header";
+import { hideCenterButton, setupAboutPage, showCenterButton } from "./softkeys";
+import { getCountryForTimezone } from "./data/timezone";
 
 type InputIndex = 1 | 2;
 
 let focusIndex: InputIndex = 1;
 let activeIndex: InputIndex = 1;
-let currency1: CurrencyCode = "usd";
-let currency2: CurrencyCode = "inr";
+let currency1: CurrencyCode =
+  (localStorage.getItem("currency1") as CurrencyCode) ?? "inr";
+let currency2: CurrencyCode =
+  (localStorage.getItem("currency2") as CurrencyCode) ?? "usd";
 let quantity1 = 0;
 let quantity2 = 0;
 let exchangeRates: USDExchangeRateResponse | null = null;
@@ -30,17 +35,44 @@ const currencyInput1 = new CurrencyInput();
 const currencyInput2 = new CurrencyInput();
 
 [currencyInput1, currencyInput2].forEach((el, i) => {
-  el.setAttribute("id", `currency${i+1}`);
-  el.setAttribute("name", `currency${i+1}`);
-  el.currency = (i === 0) ? currency1 : currency2;
+  el.setAttribute("id", `currency${i + 1}`);
+  el.setAttribute("name", `currency${i + 1}`);
+  el.currency = i === 0 ? currency1 : currency2;
 });
+
+if (!localStorage.getItem("countryGuessed")) {
+  localStorage.setItem("countryGuessed", "1");
+
+  // Predict a country based on the user's time zone
+  const guessedCountry = getCountryForTimezone(
+    new Intl.DateTimeFormat().resolvedOptions().timeZone,
+  )?.id;
+
+  console.log('Guessed Country', guessedCountry);
+
+  if (guessedCountry) {
+    console.log('CURRENCIES', CURRENCIES)
+    const guessedCurrency = guessCurrency(guessedCountry)
+
+    console.log('Guessed Currency', guessedCurrency);
+    if (guessedCurrency) {
+      currency1 = guessedCurrency.currencyCode;
+      storeCurrency();
+    }
+  }
+}
+
+function storeCurrency() {
+  localStorage.setItem("currency1", currency1);
+  localStorage.setItem("currency2", currency2);
+}
 
 currencyContainer1?.appendChild(currencyInput1);
 currencyContainer2?.appendChild(currencyInput2);
 
 const currencyLabel1 = _("currency1-label") as HTMLLabelElement;
 const currencyLabel2 = _("currency2-label") as HTMLLabelElement;
-const reverseButton = _("reverse") as HTMLButtonElement;
+const reverseButton = _("reverse") as HTMLDivElement;
 
 const stateMap = {
   1: () => ({
@@ -74,6 +106,8 @@ const setCurrencyState = (
     }
     if (updates.quantity != null) quantity2 = updates.quantity;
   }
+
+  storeCurrency();
 };
 
 function updateUI() {
@@ -97,14 +131,25 @@ function handleInputChange(event: KeyboardEvent) {
 
   switch (event.key) {
     case "ArrowDown":
-      if (input === currencyInput1) currencyInput2.focus();
-      return event.preventDefault();
+      if (input === currencyInput1 && event.type === "keydown") {
+        reverseButton.focus();
+        hideCenterButton();
+        event.preventDefault();
+      }
+      return;
     case "ArrowUp":
-      if (input === currencyInput2) currencyInput1.focus();
-      return event.preventDefault();
+      if (input === currencyInput2 && event.type === "keydown") {
+        reverseButton.focus();
+        hideCenterButton();
+        event.preventDefault();
+      }
+      return;
     case "Enter":
-      activeIndex = focusIndex;
-      return openCurrencyDialog();
+      if (event.type === "keyup") {
+        activeIndex = focusIndex;
+        openCurrencyDialog();
+      }
+      return;
   }
 
   const index = input === currencyInput1 ? 1 : 2;
@@ -127,12 +172,28 @@ function updateLabel(label: HTMLLabelElement, code: CurrencyCode) {
   const currency = findCurrency(code);
   if (!currency) return;
   const country = getCountryCode(currency);
-  label.innerHTML = `${code.toUpperCase()} <i class="fflag fflag-${country} ff-round ff-md"></i>`;
+  label.innerHTML = `${code.toUpperCase()} <div><i class="fflag fflag-${country} ff-round ff-md">`;
+}
+
+export function updateHomeHeader() {
+  // performance isn't a problem in CloudPhone :)
+  const _currency1 = findCurrency(currency1)!;
+  const _currency2 = findCurrency(currency2)!;
+
+  // setHeaderText(
+  //   // if one of them is RTL we probably should format it differently
+  //   isRTL(_currency1.languageCode) || isRTL(_currency2.languageCode)
+  //     ? `${_currency2.currencySymbol} ← ${_currency1.currencySymbol}`
+  //     : `${_currency1.currencySymbol} → ${_currency2.currencySymbol}`,
+  // );
+
+  setHeaderText(`${_currency1.currencySymbol} → ${_currency2.currencySymbol}`);
 }
 
 export function reverseCurrencies() {
   // Flip values
   [currency1, currency2] = [currency2, currency1];
+  storeCurrency();
   [quantity1, quantity2] = [quantity2, quantity1];
 
   updateLabel(currencyLabel1, currency1);
@@ -143,9 +204,12 @@ export function reverseCurrencies() {
   if (hasInput) {
     currencyInput1.value = quantity1;
     currencyInput2.value = quantity2;
-    currencyInput1.currency = currency1;
-    currencyInput2.currency = currency2;
   }
+
+  currencyInput1.currency = currency1;
+  currencyInput2.currency = currency2;
+
+  updateHomeHeader();
 
   window.dispatchEvent(
     new CustomEvent<CurrenciesReversedEvent>(CURRENCIES_REVERSED, {
@@ -164,19 +228,43 @@ function onCurrencyLabelClick(e: Event) {
   openCurrencyDialog();
 }
 
+function handleReverseButtonKeydown(e: KeyboardEvent) {
+  const key = e.key;
+
+  switch (key) {
+    case "ArrowUp":
+      e.preventDefault();
+      currencyInput1.focus();
+      showCenterButton();
+      break;
+    case "ArrowDown":
+      e.preventDefault();
+      currencyInput2.focus();
+      showCenterButton();
+      break;
+    case "Enter":
+      reverseCurrencies();
+      break;
+  }
+}
+
 function bindInputs() {
   [currencyInput1, currencyInput2].forEach((input) => {
     input.value = 0;
+    input.addEventListener("keydown", handleInputChange);
     input.addEventListener("keyup", handleInputChange);
     input.addEventListener("focus", handleFocus);
     input.addEventListener("blur", handleBlur);
   });
 
-  [currencyLabel1, currencyLabel2].forEach((label) =>
-    label.addEventListener("click", onCurrencyLabelClick),
-  );
+  if (import.meta.env.DEV) {
+    [currencyLabel1, currencyLabel2].forEach((label) =>
+      label.addEventListener("click", onCurrencyLabelClick),
+    );
+  }
 
-  reverseButton.addEventListener("click", reverseCurrencies);
+  // reverseButton.addEventListener("click", reverseCurrencies);
+  reverseButton.addEventListener("keydown", handleReverseButtonKeydown);
 }
 
 function onCurrencySelected(event: Event) {
@@ -197,8 +285,19 @@ export function setCurrency(index: InputIndex, newCode: CurrencyCode) {
   );
 }
 
+export function focusHome() {
+  stateMap[focusIndex]().input.focus();
+  showCenterButton();
+}
+
 export function setup(rates: USDExchangeRateResponse) {
   exchangeRates = rates;
   bindInputs();
+  focusHome();
+  setupAboutPage();
+  updateLabel(currencyLabel1, currency1);
+  updateLabel(currencyLabel2, currency2);
   window.addEventListener(CURRENCY_SELECTED, onCurrencySelected);
 }
+
+updateHomeHeader();

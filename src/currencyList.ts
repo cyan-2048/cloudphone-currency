@@ -3,10 +3,27 @@ import { Currency, CurrencyCode } from "./data/currency";
 import { CURRENCY_SELECTED, CurrencySelectedEvent } from "./events";
 import { getDirection } from "./language";
 import { _ } from "./utils";
+import "./currencyList.css";
+import { focusHome, updateHomeHeader } from "./input";
+import { setHeaderText } from "./header";
+import { hideCenterButton, hideInfoButton, showInfoButton } from "./softkeys";
 
 const dialog = _("choose-currency") as HTMLDialogElement;
 const list = _("currency-list") as HTMLOListElement;
 const template = _("currency-list-item") as HTMLTemplateElement;
+
+function scrollIntoViewIfNeeded(el: HTMLElement) {
+  // scrollIntoViewIfNeeded is supported on chrome
+  if (
+    "scrollIntoViewIfNeeded" in el &&
+    typeof el.scrollIntoViewIfNeeded == "function"
+  ) {
+    el.scrollIntoViewIfNeeded(false);
+  } else {
+    // fallback (firefox)
+    el.scrollIntoView();
+  }
+}
 
 const $ = <T extends Element>(selector: string, root: ParentNode) =>
   root.querySelector(selector) as T;
@@ -16,9 +33,8 @@ function queryCurrencyCode(el: HTMLElement): CurrencyCode | undefined {
   return el.dataset.code as CurrencyCode | undefined;
 }
 
-function onCurrencyClick(event: Event) {
-  const currencyCode = queryCurrencyCode(event.target as HTMLElement);
-  console.log("onCurrencyClick", currencyCode, event);
+function onCurrencyClick(currencyCode?: CurrencyCode) {
+  console.log("onCurrencyClick", currencyCode);
 
   if (currencyCode) {
     window.dispatchEvent(
@@ -28,7 +44,6 @@ function onCurrencyClick(event: Event) {
     );
   }
 
-  unselectCurrency();
   hideCurrencyList();
 }
 
@@ -36,14 +51,17 @@ function createListItem(currency: Currency) {
   const countryCode = getCountryCode(currency);
   const clone = template.content.cloneNode(true) as DocumentFragment;
 
-  const item = $(".currency-item", clone) as HTMLButtonElement;
+  const li = $("li", clone) as HTMLLIElement;
+  li.tabIndex = 0;
+
+  const item = $(".currency-item", clone) as HTMLDivElement;
   item.dataset.code = currency.currencyCode;
-  item.lang = currency.languageCode;
-  item.dir = getDirection(currency.languageCode);
+  // item.lang = currency.languageCode;
+  // item.dir = getDirection(currency.languageCode);
 
   $(".fflag", clone)?.classList.add(`fflag-${countryCode}`);
   $(".currency-symbol", clone).textContent = currency.currencySymbol;
-  $(".currency-name", clone).textContent = currency.localCurrencyName;
+  $(".currency-name span", clone).textContent = currency.localCurrencyName;
   $(".currency-code", clone).textContent = currency.currencyCode;
 
   return clone;
@@ -56,26 +74,106 @@ export function populateList() {
   );
 
   list.append(fragment);
-  list.addEventListener("click", onCurrencyClick);
+  // list.addEventListener("click", onCurrencyClick, true);
 }
 
 function unselectCurrency() {
-  const el = list.querySelector("[disabled]") as HTMLButtonElement | null;
-  if (el) {
-    el.removeAttribute("disabled");
-    el.ariaDisabled = "false";
-  }
+  list
+    .querySelectorAll<HTMLDivElement>("[aria-disabled=true]")
+    .forEach((el) => {
+      el.ariaDisabled = "false";
+    });
 }
 
 export function selectCurrency(code: CurrencyCode) {
   const el = list.querySelector(
     `[data-code="${code}"]`,
-  ) as HTMLButtonElement | null;
+  ) as HTMLDivElement | null;
   if (el) {
-    el.setAttribute("disabled", "");
     el.ariaDisabled = "true";
+    // wait until dialog is open
+    queueMicrotask(() => {
+      scrollIntoViewIfNeeded(el);
+      el.parentElement!.focus();
+    });
   }
 }
 
-export const hideCurrencyList = () => (dialog.open = false);
-export const showCurrencyList = () => (dialog.open = true);
+function handleBackEvent(ev: Event) {
+  ev.preventDefault();
+  hideCurrencyList();
+}
+
+function handleKeydown(ev: KeyboardEvent) {
+  const target = ev.target as HTMLLIElement;
+  if (ev.key === "ArrowUp") {
+    // prevent scroll
+    ev.preventDefault();
+    const el = (target.previousElementSibling ||
+      target.parentElement!.lastElementChild) as HTMLLIElement;
+    scrollIntoViewIfNeeded(el);
+    el.focus();
+  }
+
+  if (ev.key === "ArrowDown") {
+    ev.preventDefault();
+    const el = (target.nextElementSibling ||
+      target.parentElement!.firstElementChild) as HTMLLIElement;
+    scrollIntoViewIfNeeded(el);
+    el.focus();
+  }
+}
+
+function handleKeyUp(ev: KeyboardEvent) {
+  const target = ev.target as HTMLLIElement;
+
+  if (ev.key == "Enter") {
+    const button = target.firstElementChild as HTMLDivElement;
+    setTimeout(() => {
+      onCurrencyClick(queryCurrencyCode(button));
+    }, 1);
+  }
+}
+
+function handleFocus(ev: FocusEvent) {
+  const target = ev.target as HTMLLIElement;
+
+  if (target.tagName != "LI") return;
+
+  const el = $<HTMLDivElement>(".currency-name", target);
+  const overflowing =
+    el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth;
+
+  if (overflowing) target.classList.add("marquee");
+}
+
+function handleBlur(ev: FocusEvent) {
+  const target = ev.target as HTMLLIElement;
+
+  target.classList.remove("marquee");
+}
+
+export const showCurrencyList = () => {
+  dialog.open = true;
+  dialog.addEventListener("keydown", handleKeydown, true);
+  dialog.addEventListener("keyup", handleKeyUp, true);
+  dialog.addEventListener("focus", handleFocus, true);
+  dialog.addEventListener("blur", handleBlur, true);
+  setHeaderText("Currency");
+  hideInfoButton();
+  hideCenterButton();
+  window.addEventListener("back", handleBackEvent);
+};
+
+export const hideCurrencyList = () => {
+  dialog.open = false;
+  unselectCurrency();
+  dialog.removeEventListener("keydown", handleKeydown, true);
+  dialog.removeEventListener("keyup", handleKeyUp, true);
+  dialog.removeEventListener("focus", handleFocus, true);
+  dialog.removeEventListener("blur", handleBlur, true);
+  updateHomeHeader();
+  showInfoButton();
+  focusHome();
+  window.removeEventListener("back", handleBackEvent);
+};
