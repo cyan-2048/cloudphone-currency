@@ -11,11 +11,11 @@ interface Data {
 }
 
 interface TimezoneEntry {
-  u?: number;          // UTC offset in minutes
-  d?: number;          // DST offset in minutes
-  a?: string;          // aliasOf
-  c?: string[];        // country codes
-  r?: number;          // deprecated flag
+  u?: number; // UTC offset in minutes
+  d?: number; // DST offset in minutes
+  a?: string; // aliasOf
+  c?: string[]; // country codes
+  r?: number; // deprecated flag
 }
 
 interface Country {
@@ -155,7 +155,7 @@ function memoizeTimezone(timezone: Timezone | null): void {
 
 export function getCountry(
   id: string,
-  options: DeliverCountryOptions = {}
+  options: DeliverCountryOptions = {},
 ): DeliveredCountry | null {
   if (!countries[id]) memoizeCountry(buildCountry(data, id));
   return deliverCountry(countries[id], options);
@@ -168,7 +168,7 @@ export function getTimezone(name: string): Timezone | null {
 
 export function getCountriesForTimezone(
   tzName: string,
-  options: DeliverCountryOptions = {}
+  options: DeliverCountryOptions = {},
 ): (DeliveredCountry | null)[] {
   const timezone = getTimezone(tzName) || { countries: [] };
   const values = timezone.countries;
@@ -177,7 +177,7 @@ export function getCountriesForTimezone(
 
 export function getCountryForTimezone(
   tzName: string,
-  options: DeliverCountryOptions = {}
+  options: DeliverCountryOptions = {},
 ): DeliveredCountry | null {
   const [main] = getCountriesForTimezone(tzName, options);
   return main || null;
@@ -185,7 +185,7 @@ export function getCountryForTimezone(
 
 function deliverCountry(
   country: Country | undefined,
-  options: DeliverCountryOptions
+  options: DeliverCountryOptions,
 ): DeliveredCountry | null {
   if (!country) return null;
   const { deprecated } = options || {};

@@ -31,8 +31,7 @@ function fetchWithFallback(
 }
 
 export function formatDate(date: ExchangeRateDate) {
-  return new Intl.DateTimeFormat(navigator.language)
-    .format(new Date(date));
+  return new Intl.DateTimeFormat(navigator.language).format(new Date(date));
 }
 
 export type ExchangeRateResponse = {

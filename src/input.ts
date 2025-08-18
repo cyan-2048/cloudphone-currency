@@ -1,4 +1,9 @@
-import { CURRENCIES, findCurrency, getCountryCode, guessCurrency } from "./data/currencies";
+import {
+  CURRENCIES,
+  findCurrency,
+  getCountryCode,
+  guessCurrency,
+} from "./data/currencies";
 import { exchange, USDExchangeRateResponse } from "./exchangeApi";
 import { CurrencyCode } from "./data/currency";
 import { _ } from "./utils";
@@ -48,13 +53,13 @@ if (!localStorage.getItem("countryGuessed")) {
     new Intl.DateTimeFormat().resolvedOptions().timeZone,
   )?.id;
 
-  console.log('Guessed Country', guessedCountry);
+  console.log("Guessed Country", guessedCountry);
 
   if (guessedCountry) {
-    console.log('CURRENCIES', CURRENCIES)
-    const guessedCurrency = guessCurrency(guessedCountry)
+    console.log("CURRENCIES", CURRENCIES);
+    const guessedCurrency = guessCurrency(guessedCountry);
 
-    console.log('Guessed Currency', guessedCurrency);
+    console.log("Guessed Currency", guessedCurrency);
     if (guessedCurrency) {
       currency1 = guessedCurrency.currencyCode;
       storeCurrency();

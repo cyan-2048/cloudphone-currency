@@ -36,7 +36,10 @@ export type FractionDigits = 0 | 1 | 2 | 3;
 
 export const CURRENCIES = currencies as Currency[];
 
-export const COUNTRIES = new Map(Object.entries(countries)) as Map<string, CurrencyCode>;
+export const COUNTRIES = new Map(Object.entries(countries)) as Map<
+  string,
+  CurrencyCode
+>;
 
 export function findCurrency(
   currencyCode: string | CurrencyCode,
@@ -97,7 +100,7 @@ export function getCountryCode(currency: Currency) {
 
 export function guessCurrency(countryCode: string) {
   const currencyCode = COUNTRIES.get(countryCode.toUpperCase());
-  console.log('guessCurrency', countryCode, currencyCode);
+  console.log("guessCurrency", countryCode, currencyCode);
   if (currencyCode) {
     return findCurrency(currencyCode);
   }
