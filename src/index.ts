@@ -2,7 +2,6 @@ import { populateList } from "./currencyList";
 import {
   fetchUSDExchangeRates,
   formatDate,
-  USDExchangeRateResponse,
 } from "./exchangeApi";
 import { setup } from "./input";
 import "./currencyInput";

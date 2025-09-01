@@ -1,7 +1,6 @@
 import { CURRENCIES, getCountryCode } from "./data/currencies";
 import { Currency, CurrencyCode } from "./data/currency";
 import { CURRENCY_SELECTED, CurrencySelectedEvent } from "./events";
-import { getDirection } from "./language";
 import { _ } from "./utils";
 import "./currencyList.css";
 import { focusHome, updateHomeHeader } from "./input";
