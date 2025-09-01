@@ -1,7 +1,15 @@
 import { pluginHtmlMinifierTerser } from "rsbuild-plugin-html-minifier-terser";
 import { defineConfig } from "@rsbuild/core";
 
+const publicPath = process.env.BASE_PATH || '';
+
 export default defineConfig({
+  output: {
+    distPath: {
+      js: `${publicPath}static/js`,
+      css: `${publicPath}static/css`,
+    }
+  },
   tools: {
     cssLoader: {
       url: {
