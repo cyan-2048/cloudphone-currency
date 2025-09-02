@@ -1,5 +1,5 @@
 import "./header.css";
-import { _ } from "./utils";
+import { _ } from "../helpers/utils";
 
 const header = _("cp-header") as HTMLHeadElement;
 

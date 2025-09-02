@@ -1,4 +1,4 @@
-import { CurrencyCode } from "./data/currency";
+import { CurrencyCode } from "../data/currency";
 
 export const CURRENCY_SELECTED = "currencySelected";
 export const CURRENCY_CHANGED = "currencyChange";

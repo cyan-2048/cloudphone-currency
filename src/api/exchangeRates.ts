@@ -1,6 +1,6 @@
-import { formatFromCode } from "./data/currencies";
-import { CurrencyCode } from "./data/currency";
-import { IsoDateString } from "./date";
+import { formatFromCode } from "../data/currencies";
+import { CurrencyCode } from "../data/currency";
+import { IsoDateString } from "../helpers/date";
 
 // API Version
 const V1 = "v1";

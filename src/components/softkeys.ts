@@ -1,6 +1,6 @@
-import { showAbout } from "./about";
+import { showAbout } from "../pages/about";
 import "./softkeys.css";
-import { _ } from "./utils";
+import { _ } from "../helpers/utils";
 
 const footer = _("cp-softkeys") as HTMLElement;
 const infoButton = footer.firstElementChild as HTMLDivElement;

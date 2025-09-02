@@ -1,12 +1,12 @@
-import { populateList } from "./currencyList";
+import { populateList } from "./pages/currencyList";
 import {
   fetchUSDExchangeRates,
   formatDate,
-} from "./exchangeApi";
+} from "./api/exchangeRates";
 import { setup } from "./input";
-import "./currencyInput";
+import "./components/currencyInput";
 import "./index.css";
-import { _ } from "./utils";
+import { _ } from "./helpers/utils";
 
 populateList();
 

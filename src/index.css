@@ -221,7 +221,7 @@ input::-webkit-inner-spin-button {
 /* https://www.freakflagsprite.com/ */
 
 .fflag {
-  background-image: url("/img/flags.png");
+  background-image: url("/assets/img/flags.png");
   background-repeat: no-repeat;
   background-size: 100% 49494%;
   display: inline-block;

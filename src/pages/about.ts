@@ -1,10 +1,10 @@
 // import styles for dialog
 import "./currencyList.css";
 import "./about.css";
-import { _ } from "./utils";
-import { focusHome, updateHomeHeader } from "./input";
-import { setHeaderText } from "./header";
-import { hideCenterButton, hideInfoButton, showInfoButton } from "./softkeys";
+import { _ } from "../helpers/utils";
+import { focusHome, updateHomeHeader } from "../input";
+import { setHeaderText } from "../components/header";
+import { hideCenterButton, hideInfoButton, showInfoButton } from "../components/softkeys";
 
 const dialog = _("about") as HTMLDialogElement;
 

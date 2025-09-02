@@ -4,9 +4,9 @@ import {
   getCountryCode,
   guessCurrency,
 } from "./data/currencies";
-import { exchange, USDExchangeRateResponse } from "./exchangeApi";
+import { exchange, USDExchangeRateResponse } from "./api/exchangeRates";
 import { CurrencyCode } from "./data/currency";
-import { _ } from "./utils";
+import { _ } from "./helpers/utils";
 import {
   CURRENCIES_REVERSED,
   CurrenciesReversedEvent,
@@ -14,11 +14,11 @@ import {
   CURRENCY_SELECTED,
   CurrencyChangedEvent,
   CurrencySelectedEvent,
-} from "./events";
-import { selectCurrency, showCurrencyList } from "./currencyList";
-import { CurrencyInput } from "./currencyInput";
-import { setHeaderText } from "./header";
-import { hideCenterButton, setupAboutPage, showCenterButton } from "./softkeys";
+} from "./helpers/events";
+import { selectCurrency, showCurrencyList } from "./pages/currencyList";
+import { CurrencyInput } from "./components/currencyInput";
+import { setHeaderText } from "./components/header";
+import { hideCenterButton, setupAboutPage, showCenterButton } from "./components/softkeys";
 import { getCountryForTimezone } from "./data/timezone";
 
 type InputIndex = 1 | 2;

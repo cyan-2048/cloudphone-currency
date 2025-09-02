@@ -3,7 +3,7 @@ import {
   getFormatter,
   getFractionDigits,
   USD,
-} from "./data/currencies";
+} from "../data/currencies";
 
 const DIGITS = new RegExp(/\d/);
 const ONLY_DIGITS = new RegExp(/^[0-9]$/);

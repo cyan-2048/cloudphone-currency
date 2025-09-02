@@ -1,11 +1,11 @@
-import { CURRENCIES, getCountryCode } from "./data/currencies";
-import { Currency, CurrencyCode } from "./data/currency";
-import { CURRENCY_SELECTED, CurrencySelectedEvent } from "./events";
-import { _ } from "./utils";
+import { CURRENCIES, getCountryCode } from "../data/currencies";
+import { Currency, CurrencyCode } from "../data/currency";
+import { CURRENCY_SELECTED, CurrencySelectedEvent } from "../helpers/events";
+import { _ } from "../helpers/utils";
 import "./currencyList.css";
-import { focusHome, updateHomeHeader } from "./input";
-import { setHeaderText } from "./header";
-import { hideCenterButton, hideInfoButton, showInfoButton } from "./softkeys";
+import { focusHome, updateHomeHeader } from "../input";
+import { setHeaderText } from "../components/header";
+import { hideCenterButton, hideInfoButton, showInfoButton } from "../components/softkeys";
 
 const dialog = _("choose-currency") as HTMLDialogElement;
 const list = _("currency-list") as HTMLOListElement;
