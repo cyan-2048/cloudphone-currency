@@ -138,7 +138,7 @@ function handleKeyUp(ev: KeyboardEvent) {
   }
 }
 
-function handleFocus(ev: FocusEvent) {
+export function handleFocus(ev: FocusEvent) {
   const target = ev.target as HTMLLIElement;
 
   if (target.tagName != "LI") return;
@@ -150,7 +150,7 @@ function handleFocus(ev: FocusEvent) {
   if (overflowing) target.classList.add("marquee");
 }
 
-function handleBlur(ev: FocusEvent) {
+export function handleBlur(ev: FocusEvent) {
   const target = ev.target as HTMLLIElement;
 
   target.classList.remove("marquee");

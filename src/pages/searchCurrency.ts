@@ -1,7 +1,14 @@
 import { hideInfoButton, setInfoButtonState } from "../components/softkeys";
 import { CURRENCIES } from "../data/currencies";
 import { _ } from "../helpers/utils";
-import { createListItem, onCurrencyClick, queryCurrencyCode, scrollIntoViewIfNeeded } from "./currencyList";
+import {
+  createListItem,
+  handleBlur,
+  handleFocus,
+  onCurrencyClick,
+  queryCurrencyCode,
+  scrollIntoViewIfNeeded,
+} from "./currencyList";
 import "./searchCurrency.css";
 
 const dialog = _("search") as HTMLDialogElement;
@@ -104,6 +111,9 @@ export function showSearch() {
   list.addEventListener("keydown", handleListKeydown, true);
   list.addEventListener("keyup", handleListKeyUp, true);
 
+  list.addEventListener("focus", handleFocus, true);
+  list.addEventListener("blur", handleBlur, true);
+
   dialog.open = true;
   setInfoButtonState("search");
   hideInfoButton();
@@ -119,6 +129,9 @@ export function hideSearch() {
 
   list.removeEventListener("keydown", handleListKeydown, true);
   list.removeEventListener("keyup", handleListKeyUp, true);
+
+  list.removeEventListener("focus", handleFocus, true);
+  list.removeEventListener("blur", handleBlur, true);
 
   list.innerHTML = "";
   currentSearchText = "";
