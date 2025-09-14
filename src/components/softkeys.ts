@@ -1,6 +1,7 @@
 import { showAbout } from "../pages/about";
 import "./softkeys.css";
 import { _ } from "../helpers/utils";
+import { showSearch } from "../pages/searchCurrency";
 
 const footer = _("cp-softkeys") as HTMLElement;
 const infoButton = footer.firstElementChild as HTMLDivElement;
@@ -33,9 +34,24 @@ export function hideCenterButton() {
   centerButton.ariaDisabled = "true";
 }
 
+export function setInfoButtonState(state: string) {
+  infoButton.dataset.state = state;
+}
+
+export function getInfoButtonState() {
+  return infoButton.dataset.state || "";
+}
+
 function handleKeydown(ev: KeyboardEvent) {
-  if (ev.key == "Escape" && infoButton.ariaDisabled !== "true") {
-    showAbout();
+  if (ev.key == "Escape") {
+    if (infoButton.dataset.state === "list") {
+      showSearch();
+      return;
+    }
+
+    if (infoButton.ariaDisabled !== "true") {
+      showAbout();
+    }
   }
 
   if (import.meta.env.DEV) {

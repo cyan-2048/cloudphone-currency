@@ -5,13 +5,14 @@ import { _ } from "../helpers/utils";
 import "./currencyList.css";
 import { focusHome, updateHomeHeader } from "../input";
 import { setHeaderText } from "../components/header";
-import { hideCenterButton, hideInfoButton, showInfoButton } from "../components/softkeys";
+import { getInfoButtonState, hideCenterButton, setInfoButtonState, showInfoButton } from "../components/softkeys";
+import { hideSearch } from "./searchCurrency";
 
 const dialog = _("choose-currency") as HTMLDialogElement;
 const list = _("currency-list") as HTMLOListElement;
 const template = _("currency-list-item") as HTMLTemplateElement;
 
-function scrollIntoViewIfNeeded(el: HTMLElement) {
+export function scrollIntoViewIfNeeded(el: HTMLElement) {
   // scrollIntoViewIfNeeded is supported on chrome
   if (
     "scrollIntoViewIfNeeded" in el &&
@@ -27,12 +28,12 @@ function scrollIntoViewIfNeeded(el: HTMLElement) {
 const $ = <T extends Element>(selector: string, root: ParentNode) =>
   root.querySelector(selector) as T;
 
-function queryCurrencyCode(el: HTMLElement): CurrencyCode | undefined {
+export function queryCurrencyCode(el: HTMLElement): CurrencyCode | undefined {
   while (el && !el.dataset.code && el.parentElement) el = el.parentElement;
   return el.dataset.code as CurrencyCode | undefined;
 }
 
-function onCurrencyClick(currencyCode?: CurrencyCode) {
+export function onCurrencyClick(currencyCode?: CurrencyCode) {
   console.log("onCurrencyClick", currencyCode);
 
   if (currencyCode) {
@@ -46,7 +47,7 @@ function onCurrencyClick(currencyCode?: CurrencyCode) {
   hideCurrencyList();
 }
 
-function createListItem(currency: Currency) {
+export function createListItem(currency: Currency) {
   const countryCode = getCountryCode(currency);
   const clone = template.content.cloneNode(true) as DocumentFragment;
 
@@ -100,6 +101,9 @@ export function selectCurrency(code: CurrencyCode) {
 
 function handleBackEvent(ev: Event) {
   ev.preventDefault();
+  if (getInfoButtonState() === "search") {
+    hideSearch();
+  }
   hideCurrencyList();
 }
 
@@ -159,7 +163,8 @@ export const showCurrencyList = () => {
   dialog.addEventListener("focus", handleFocus, true);
   dialog.addEventListener("blur", handleBlur, true);
   setHeaderText("Currency");
-  hideInfoButton();
+  showInfoButton();
+  setInfoButtonState("list");
   hideCenterButton();
   window.addEventListener("back", handleBackEvent);
 };
@@ -173,6 +178,7 @@ export const hideCurrencyList = () => {
   dialog.removeEventListener("blur", handleBlur, true);
   updateHomeHeader();
   showInfoButton();
+  setInfoButtonState("");
   focusHome();
   window.removeEventListener("back", handleBackEvent);
 };
